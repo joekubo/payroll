@@ -376,8 +376,11 @@ public class PanelEvaluation extends javax.swing.JPanel {
 //-------------------------------------------------Loans-----------------------------------------------------------------------------------------
     private void evaluateBalancebf(){
         try{
-           String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM loantable WHERE staffno = "
-                   + "'"+txtStaffNo.getText()+"'AND loantable.year = '"+comboYear.getSelectedItem().toString()+"'";
+//           String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM loantable WHERE staffno = "
+//                   + "'"+txtStaffNo.getText()+"'AND loantable.year = '"+comboYear.getSelectedItem().toString()+"'";
+String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM loantable WHERE staffno = "
+                   + "'"+txtStaffNo.getText()+"'";
+
            pst = conn.prepareStatement(sql);
            rs = pst.executeQuery();
            if(rs.next()){
@@ -436,7 +439,7 @@ public class PanelEvaluation extends javax.swing.JPanel {
                 pst.execute();
              }
             }catch(Exception e){
-                //JOptionPane.showMessageDialog(null ,e);
+                JOptionPane.showMessageDialog(null ,e);
             }finally{
                 try{
                     rs.close();
@@ -2989,17 +2992,21 @@ private void selectedRowAllEmployees(){
         balcd = balcd.trim();
         double Balcd = Double.parseDouble(balcd);
 
-            if(Balcd < 0){
+            if(Balcd <= 0){
                 txtAddLoan.requestFocus();
               //txtDeductionAmount.setText("0.00");
                 saveDeduction();
                 calculateloan();
             }else{
                 if(txtDeduction.getText().equals("LOAN")){
+                    evaluateBalancebf();
                     saveDeduction();
                     saveLoan();
+                    DialogDeductions.dispose();
+                    updatePayment();
+                    
                     ForDeduction();
-                    evaluateBalancebf();
+                    
                     resetDeds();
                 }else{
                     saveDeduction();
