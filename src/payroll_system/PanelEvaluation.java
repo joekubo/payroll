@@ -24,6 +24,7 @@ public class PanelEvaluation extends javax.swing.JPanel {
         ResultSet rs1 = null;
         private String staffno;
         DefaultTableModel dm = new DefaultTableModel();
+        double Paidamount = 0;
     public PanelEvaluation() {
         initComponents();
         conn = javaconnect.ConnecrDb();
@@ -406,7 +407,7 @@ String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM l
                
                String paidamount = txtDeductionAmount.getText();
                paidamount = paidamount.trim();
-               double Paidamount = Double.parseDouble(paidamount);
+               Paidamount = Double.parseDouble(paidamount);
                String Balance_cf = txtBal_c_f.getText();
                double balance_cf = Double.parseDouble(Balance_cf);
                txtBal_c_f.setText(String.format("%.2f",balance_cf));
@@ -415,10 +416,13 @@ String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM l
                txtBal_cd.setText(String.format("%.2f", balance_cd));
         
     }
-    private void saveLoan(){
+    private void saveLoan(int type){
         try{
                 String deductionname = txtDeduction.getText();
                 String Amount = txtDeductionAmount.getText();
+                
+                String deduction = "0";
+                String addLoan = "0";
             
                 if(deductionname.equals("")){
                     txtDeduction.requestFocus();
@@ -432,8 +436,12 @@ String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM l
                 pst.setString(2, comboMonth.getSelectedItem().toString());
                 pst.setString(3, comboYear.getSelectedItem().toString());
                 pst.setString(4, txtBal_c_f.getText());
-                pst.setString(5, txtDeductionAmount.getText());
-                pst.setString(6, txtAddLoan.getText());
+                    if(type == 1){
+                        deduction = txtDeductionAmount.getText();
+                        addLoan = txtAddLoan.getText();
+                    }
+                pst.setString(5, deduction);
+                pst.setString(6, addLoan);
                 pst.setString(7, txtBal_cd.getText());
                 
                 pst.execute();
@@ -1048,7 +1056,6 @@ private void selectedRowAllEmployees(){
     
     private void savePayment(){
         try{
-            String staffno = txtStaffNo.getText();
             if(staffno.equals("")){
                 buttonShowRegisteredEmployees.requestFocus();
             }else{
@@ -1068,8 +1075,10 @@ private void selectedRowAllEmployees(){
             pst.setString(10, txtTaxableAmount.getText());
             pst.setString(11, txtTotalDeductions.getText());
             pst.setString(12, txtNetSalary.getText());
-            pst.setString(13, txtTier1.getText());
-            pst.setString(14, txtTier2.getText());
+//            pst.setString(13, txtTier1.getText());
+//            pst.setString(14, txtTier2.getText());
+            pst.setString(13, "360");
+            pst.setString(14, "720");
             pst.setString(15, txtEmployeeName.getText());
             pst.setString(16, txtGross.getText());
            
@@ -3000,12 +3009,15 @@ private void selectedRowAllEmployees(){
                 txtAddLoan.requestFocus();
               //txtDeductionAmount.setText("0.00");
                 saveDeduction();
+                //save loan
+                saveLoan(0);
                 calculateloan();
+                
             }else{
                 if(txtDeduction.getText().equals("LOAN")){
                     evaluateBalancebf();
                     saveDeduction();
-                    saveLoan();
+                    saveLoan(1);
                     DialogDeductions.dispose();
                     updatePayment();
                     
