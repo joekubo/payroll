@@ -846,9 +846,11 @@ private void selectedRowAllEmployees(){
              String Netsalary = txtNetSalary.getText();
              String Advance = txtAdvance.getText();
              String Gross = txtGross.getText();
+//             String tier1 = txtTier1.getText();
+//             String tier2 = txtTier2.getText();
              
              String sql = "UPDATE paymenttable SET staffno = '"+Staffno+"',name = '"+Name+"',month = '"+Month+"'"
-                     + ",year = '"+Year+"',nssf = '"+Nssf+"',nhif = '"+Nhif+"',advance = '"+Advance+"',otherdeductions = '"+Otherdeductions+"',"
+                     + ",year = '"+Year+"',nssf = '"+Nssf+"', tier1 = '360',tier2 = '720',nhif = '"+Nhif+"',advance = '"+Advance+"',otherdeductions = '"+Otherdeductions+"',"
                      + "paye = '"+Paye+"',taxableamount = '"+Taxableamount+"',totalDeductions = '"+Totaldeduction+"',netsalary = '"+Netsalary+"'"
                      + ",gross = '"+Gross+"',datepay = '"+Paydate+"' WHERE paymentid = '"+Id+"'";
              pst = conn.prepareStatement(sql);
@@ -995,7 +997,7 @@ private void selectedRowAllEmployees(){
             String sql = "SELECT paymentTable.paymentId AS 'id',paymentTable.staffNo AS 'Staff No',"
                     + "employeeRegistrationTable.firstName||' '||employeeRegistrationTable.lastName AS 'Name',employeeRegistrationTable.basicsalary AS 'Basic'"
                     + ",paymentTable.gross AS 'Gross',paymentTable.month AS 'Month',paymentTable.year AS 'Year',paymentTable.datePay AS 'Payment Date',paymentTable.nssf AS"
-                    + " 'NSSF',paymentTable.nhif AS 'NHIF',paymentTable.paye AS 'PAYE',paymentTable.otherDeductions AS "
+                    + " 'NSSF',paymentTable.nhif AS 'NHIF',paymentTable.tier1 AS 'TIER1',paymentTable.tier2 AS 'TIER2',paymentTable.paye AS 'PAYE',paymentTable.otherDeductions AS "
                     + "'Other Deductions',paymentTable.advance AS 'Advance',paymentTable.totalDeductions"
                     + " AS 'Total Deductions',paymentTable.netSalary AS 'Net Salary' FROM employeeRegistrationTable,paymentTable WHERE "
                     + "employeeRegistrationTable.staffNo = paymentTable.staffNo AND paymentTable.month = '"+Month+"' AND "
@@ -1237,17 +1239,17 @@ private void selectedRowAllEmployees(){
      String grossSalary = txtGross.getText();
      String otherDeductions = txtOtherDeductions.getText();
      String advance = txtAdvance.getText();
-        double nssf = 200;
+        double nssf;
         //double nssf;
         double nhif;
         double paye;
         double tax;
-        double tier1;
-        double tier2;
+        double tier1 = 360;
+        double tier2 = 720;
         double a,b;
         
 //------------------------------------------------calculating nssf current evaluation and tier 1 & tier 2---------------------------------------------------------------------
-        
+        nssf = tier1 + tier2;
         grossSalary = grossSalary.trim();
         double gross = Double.parseDouble(grossSalary);
 
@@ -2818,6 +2820,8 @@ private void selectedRowAllEmployees(){
         DialogTier.setResizable(false);
         DialogTier.setAlwaysOnTop(true);
         DialogTier.setLocationRelativeTo(null);
+        txtTier1.setText("360");
+        txtTier2.setText("720");
     }
     private void txtStaffNoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStaffNoKeyPressed
         // TODO add your handling code here:
@@ -3152,6 +3156,7 @@ private void selectedRowAllEmployees(){
             JasperReport jr = JasperCompileManager.compileReport(jd);
             JasperPrint jp = JasperFillManager.fillReport(jr, null, conn);
             JasperViewer.viewReport(jp,false);
+            System.out.println("staff NO : " + Staffno + ", Month: " + Month);
                    
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
