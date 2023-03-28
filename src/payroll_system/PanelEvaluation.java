@@ -24,7 +24,11 @@ public class PanelEvaluation extends javax.swing.JPanel {
         ResultSet rs1 = null;
         private String staffno;
         DefaultTableModel dm = new DefaultTableModel();
+<<<<<<< HEAD
         private String whichclicked;
+=======
+        double Paidamount = 0;
+>>>>>>> 039cd798f84b5094a95a4039cd0c12a5e4f78361
     public PanelEvaluation() {
         initComponents();
         conn = javaconnect.ConnecrDb();
@@ -408,7 +412,7 @@ String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM l
                
                String paidamount = txtDeductionAmount.getText();
                paidamount = paidamount.trim();
-               double Paidamount = Double.parseDouble(paidamount);
+               Paidamount = Double.parseDouble(paidamount);
                String Balance_cf = txtBal_c_f.getText();
                double balance_cf = Double.parseDouble(Balance_cf);
                txtBal_c_f.setText(String.format("%.2f",balance_cf));
@@ -417,10 +421,13 @@ String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM l
                txtBal_cd.setText(String.format("%.2f", balance_cd));
         
     }
-    private void saveLoan(){
+    private void saveLoan(int type){
         try{
                 String deductionname = txtDeduction.getText();
                 String Amount = txtDeductionAmount.getText();
+                
+                String deduction = "0";
+                String addLoan = "0";
             
                 if(deductionname.equals("")){
                     txtDeduction.requestFocus();
@@ -434,8 +441,12 @@ String sql = "SELECT COALESCE(SUM(takenLoan),0),COALESCE(SUM(paidLoan),0) FROM l
                 pst.setString(2, comboMonth.getSelectedItem().toString());
                 pst.setString(3, comboYear.getSelectedItem().toString());
                 pst.setString(4, txtBal_c_f.getText());
-                pst.setString(5, txtDeductionAmount.getText());
-                pst.setString(6, txtAddLoan.getText());
+                    if(type == 1){
+                        deduction = txtDeductionAmount.getText();
+                        addLoan = txtAddLoan.getText();
+                    }
+                pst.setString(5, deduction);
+                pst.setString(6, addLoan);
                 pst.setString(7, txtBal_cd.getText());
                 
                 pst.execute();
@@ -848,9 +859,11 @@ private void selectedRowAllEmployees(){
              String Netsalary = txtNetSalary.getText();
              String Advance = txtAdvance.getText();
              String Gross = txtGross.getText();
+//             String tier1 = txtTier1.getText();
+//             String tier2 = txtTier2.getText();
              
              String sql = "UPDATE paymenttable SET staffno = '"+Staffno+"',name = '"+Name+"',month = '"+Month+"'"
-                     + ",year = '"+Year+"',nssf = '"+Nssf+"',nhif = '"+Nhif+"',advance = '"+Advance+"',otherdeductions = '"+Otherdeductions+"',"
+                     + ",year = '"+Year+"',nssf = '"+Nssf+"', tier1 = '360',tier2 = '720',nhif = '"+Nhif+"',advance = '"+Advance+"',otherdeductions = '"+Otherdeductions+"',"
                      + "paye = '"+Paye+"',taxableamount = '"+Taxableamount+"',totalDeductions = '"+Totaldeduction+"',netsalary = '"+Netsalary+"'"
                      + ",gross = '"+Gross+"',datepay = '"+Paydate+"' WHERE paymentid = '"+Id+"'";
              pst = conn.prepareStatement(sql);
@@ -997,7 +1010,7 @@ private void selectedRowAllEmployees(){
             String sql = "SELECT paymentTable.paymentId AS 'id',paymentTable.staffNo AS 'Staff No',"
                     + "employeeRegistrationTable.firstName||' '||employeeRegistrationTable.lastName AS 'Name',employeeRegistrationTable.basicsalary AS 'Basic'"
                     + ",paymentTable.gross AS 'Gross',paymentTable.month AS 'Month',paymentTable.year AS 'Year',paymentTable.datePay AS 'Payment Date',paymentTable.nssf AS"
-                    + " 'NSSF',paymentTable.nhif AS 'NHIF',paymentTable.paye AS 'PAYE',paymentTable.otherDeductions AS "
+                    + " 'NSSF',paymentTable.nhif AS 'NHIF',paymentTable.tier1 AS 'TIER1',paymentTable.tier2 AS 'TIER2',paymentTable.paye AS 'PAYE',paymentTable.otherDeductions AS "
                     + "'Other Deductions',paymentTable.advance AS 'Advance',paymentTable.totalDeductions"
                     + " AS 'Total Deductions',paymentTable.netSalary AS 'Net Salary' FROM employeeRegistrationTable,paymentTable WHERE "
                     + "employeeRegistrationTable.staffNo = paymentTable.staffNo AND paymentTable.month = '"+Month+"' AND "
@@ -1048,7 +1061,6 @@ private void selectedRowAllEmployees(){
     
     private void savePayment(){
         try{
-            String staffno = txtStaffNo.getText();
             if(staffno.equals("")){
                 buttonShowRegisteredEmployees.requestFocus();
             }else{
@@ -1068,8 +1080,10 @@ private void selectedRowAllEmployees(){
             pst.setString(10, txtTaxableAmount.getText());
             pst.setString(11, txtTotalDeductions.getText());
             pst.setString(12, txtNetSalary.getText());
-            pst.setString(13, txtTier1.getText());
-            pst.setString(14, txtTier2.getText());
+//            pst.setString(13, txtTier1.getText());
+//            pst.setString(14, txtTier2.getText());
+            pst.setString(13, "360");
+            pst.setString(14, "720");
             pst.setString(15, txtEmployeeName.getText());
             pst.setString(16, txtGross.getText());
            
@@ -1239,17 +1253,17 @@ private void selectedRowAllEmployees(){
      String grossSalary = txtGross.getText();
      String otherDeductions = txtOtherDeductions.getText();
      String advance = txtAdvance.getText();
-        double nssf = 200;
+        double nssf;
         //double nssf;
         double nhif;
         double paye;
         double tax;
-        double tier1;
-        double tier2;
+        double tier1 = 360;
+        double tier2 = 720;
         double a,b;
         
 //------------------------------------------------calculating nssf current evaluation and tier 1 & tier 2---------------------------------------------------------------------
-        
+        nssf = tier1 + tier2;
         grossSalary = grossSalary.trim();
         double gross = Double.parseDouble(grossSalary);
 
@@ -2820,6 +2834,8 @@ private void selectedRowAllEmployees(){
         DialogTier.setResizable(false);
         DialogTier.setAlwaysOnTop(true);
         DialogTier.setLocationRelativeTo(null);
+        txtTier1.setText("360");
+        txtTier2.setText("720");
     }
     private void txtStaffNoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStaffNoKeyPressed
         // TODO add your handling code here:
@@ -2998,12 +3014,15 @@ private void selectedRowAllEmployees(){
                 txtAddLoan.requestFocus();
               //txtDeductionAmount.setText("0.00");
                 saveDeduction();
+                //save loan
+                saveLoan(0);
                 calculateloan();
+                
             }else{
                 if(txtDeduction.getText().equals("LOAN")){
                     evaluateBalancebf();
                     saveDeduction();
-                    saveLoan();
+                    saveLoan(1);
                     DialogDeductions.dispose();
                     if(whichclicked.equals("0")){
                         updatePayment();
@@ -3156,6 +3175,7 @@ private void selectedRowAllEmployees(){
             JasperReport jr = JasperCompileManager.compileReport(jd);
             JasperPrint jp = JasperFillManager.fillReport(jr, null, conn);
             JasperViewer.viewReport(jp,false);
+            System.out.println("staff NO : " + Staffno + ", Month: " + Month);
                    
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
