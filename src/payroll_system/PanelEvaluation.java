@@ -24,9 +24,11 @@ public class PanelEvaluation extends javax.swing.JPanel {
         ResultSet rs1 = null;
         private String staffno;
         DefaultTableModel dm = new DefaultTableModel();
+        private String whichclicked;
     public PanelEvaluation() {
         initComponents();
         conn = javaconnect.ConnecrDb();
+        whichclicked = "";
         buttonView.setToolTipText("View Tier 1 & Tier 2");
         buttonShowRegisteredEmployees.setToolTipText("Click Here to Select Employee");
         monthNyear();
@@ -3003,7 +3005,9 @@ private void selectedRowAllEmployees(){
                     saveDeduction();
                     saveLoan();
                     DialogDeductions.dispose();
-                    updatePayment();
+                    if(whichclicked.equals("0")){
+                        updatePayment();
+                    }
                     
                     ForDeduction();
                     
@@ -3180,6 +3184,7 @@ private void selectedRowAllEmployees(){
     }//GEN-LAST:event_buttonDeletePaymentActionPerformed
 
     private void buttonSavePaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSavePaymentActionPerformed
+        whichclicked = "1";
         String net = txtNetSalary.getText();
         net = net.trim();
         double netsalary = Double.parseDouble(net);
@@ -3206,6 +3211,8 @@ private void selectedRowAllEmployees(){
                     buttonShowRegisteredEmployees.requestFocus();
                 }else{
                     savePayment();
+                     saveLoan();
+                    
                 }
             }catch(Exception e){
                 JOptionPane.showMessageDialog(null, e);
@@ -3398,6 +3405,7 @@ private void selectedRowAllEmployees(){
     }//GEN-LAST:event_txtGrossKeyPressed
 
     private void buttonUpdatePaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUpdatePaymentActionPerformed
+        whichclicked = "0";
         String net = txtNetSalary.getText();
         net = net.trim();
         double net_sal = Double.parseDouble(net);
